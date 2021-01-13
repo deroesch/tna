@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 /**
- * 
+ * A database of market days for ONE security.
  */
 public class DayDB {
 
@@ -51,9 +51,9 @@ public class DayDB {
 
     /**
      * Figure out the correct pathname for the input file, then load it.
-     * 
-     * @param context
-     * @param location
+     *
+     * @param context  We need the context of figure out where to look for files.
+     * @param location The target file path (relative).
      * @throws IOException
      */
     public static void initialize(@NonNull final ApplicationContext context, @NonNull final String location)
@@ -65,7 +65,7 @@ public class DayDB {
         if (dayList.size() > 0)
             return;
 
-        URI uri = context.getResource(String.format("classpath:%s", location)).getURI();
+        final URI uri = context.getResource(String.format("classpath:%s", location)).getURI();
         if (uri.getScheme().equals("jar")) {
 
             try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap());) {
@@ -77,19 +77,17 @@ public class DayDB {
     }
 
     /**
-     * Load the Day data from a disk file in xlsx format
-     * 
-     * @param path
+     * Load the Day data from a disk file in xlsx format. I use Apache POI.
+     *
+     * @param path The target file path (relative).
      * @throws IOException
      */
     public static void load(@NonNull final Path path) throws IOException {
         Preconditions.checkNotNull(path);
 
-        FileInputStream fis = new FileInputStream(path.toFile());
-        try (XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> ri = sheet.iterator();
-            Cell c;
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(path.toFile()))) {
+            final XSSFSheet sheet = workbook.getSheetAt(0);
+            final Iterator<Row> ri = sheet.iterator();
 
             // Skip header row, or fail if emtpy
             if (ri.hasNext())
@@ -99,34 +97,42 @@ public class DayDB {
 
             // Load row cells into a Day object and save it.
             while (ri.hasNext()) {
-                Row row = ri.next();
-                Iterator<Cell> ci = row.cellIterator();
+                final Row row = ri.next();
+                final Iterator<Cell> ci = row.cellIterator();
+                Cell c;
 
+                // The day's calendar date
                 c = ci.next();
-                Date date = c.getDateCellValue();
+                final Date date = c.getDateCellValue();
 
+                // The day's opening price
                 c = ci.next();
-                Double open = c.getNumericCellValue();
+                final Double open = c.getNumericCellValue();
 
+                // The day's high price
                 c = ci.next();
-                Double high = c.getNumericCellValue();
+                final Double high = c.getNumericCellValue();
 
+                // The day's low price
                 c = ci.next();
-                Double low = c.getNumericCellValue();
+                final Double low = c.getNumericCellValue();
 
+                // The day's closing price
                 c = ci.next();
-                Double close = c.getNumericCellValue();
+                final Double close = c.getNumericCellValue();
 
+                // The day's adjusted closing price
                 c = ci.next();
-                Double adjClose = c.getNumericCellValue();
+                final Double adjClose = c.getNumericCellValue();
 
+                // The day's volume
                 c = ci.next();
-                Long volume = (long) c.getNumericCellValue();
+                final Long volume = (long) c.getNumericCellValue();
 
                 // Create the day
-                Day day = new Day(date, open, high, low, close, adjClose, volume);
+                final Day day = new Day(date, open, high, low, close, adjClose, volume);
 
-                // Save to linear list
+                // Save to ordered list
                 dayList.add(day);
 
                 // Save to map
@@ -136,7 +142,8 @@ public class DayDB {
                     logger.info(String.format("Added %s", day.toString()));
             }
 
-            // dayList.add assembles these in the wrong order.
+            // dayList.add assembles these days in the wrong order. The data file is date
+            // descending order. We want the other direction, with earliest date first..
             Lists.reverse(dayList);
 
         }
@@ -148,12 +155,12 @@ public class DayDB {
     private static final boolean VERBOSE = false;
 
     /*
-     * Data as a linear list.
+     * Data stored as a linear list.
      */
     private static final List<Day> dayList = new ArrayList<>();
 
     /*
-     * Data as a map indexed by date.
+     * Data stored as a map indexed by date.
      */
     private static final Map<Date, Day> dayMap = new HashMap<>();
 

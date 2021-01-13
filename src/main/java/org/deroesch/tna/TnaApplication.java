@@ -13,13 +13,20 @@ import org.springframework.context.ApplicationContext;
 @SpringBootApplication
 public class TnaApplication {
 
-    public static void main(String[] args) throws IOException {
+    /**
+     * Main entry point
+     *
+     * @param args
+     * @throws IOException
+     */
+    public static void main(final String[] args) throws IOException {
+        final ApplicationContext ctx = SpringApplication.run(TnaApplication.class, args);
 
-        ApplicationContext ctx = SpringApplication.run(TnaApplication.class, args);
+        // Load the data from disk
         DayDB.initialize(ctx, DayDB.DB_FILE);
+        final List<Day> days = DayDB.getDayList();
 
-        List<Day> days = DayDB.getDayList();
-
+        // Compute these moving averages and attach the values to each Day object.
         MovingAverage.computeAll(days, 5);
         MovingAverage.computeAll(days, 10);
         MovingAverage.computeAll(days, 20);

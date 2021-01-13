@@ -11,7 +11,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import com.google.common.base.Preconditions;
 
 /**
- *
+ * A day in the market.
  */
 public class Day {
 

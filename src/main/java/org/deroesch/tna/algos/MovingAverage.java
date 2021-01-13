@@ -2,14 +2,30 @@ package org.deroesch.tna.algos;
 
 import java.util.List;
 
+import org.checkerframework.checker.index.qual.Positive;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.deroesch.tna.db.DayDB;
 import org.deroesch.tna.models.Day;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
+/**
+ * Moving average math.
+ */
 public class MovingAverage {
 
-    public static void computeAll(final List<Day> days, final Integer value) {
+    /**
+     * Computes and saves moving averages for each day in the days list.
+     *
+     * @param days  The subject days
+     * @param value The moving average value to find (i.e., 5, 10, 20, 50, 100)
+     */
+    public static void computeAll(@NonNull final List<Day> days, @Positive final Integer value) {
+        Preconditions.checkNotNull(days);
+        Preconditions.checkNotNull(value);
+        Preconditions.checkArgument(value > 0);
 
         Double sum = 0.0;
         Double avg = 0.0;
