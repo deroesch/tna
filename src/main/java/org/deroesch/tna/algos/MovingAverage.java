@@ -37,20 +37,21 @@ public class MovingAverage {
             // Add this day's value to the accumulator
             sum += day.getClose();
 
-            if (count >= value) {
-                avg = sum / value;
+            // We can't compute moving averages for days that are too early.
+            if (count < value)
+                continue;
 
-                // Save it!
-                day.setMovingAvg(value, avg);
+            // Compute and save.
+            avg = sum / value;
+            day.setMovingAvg(value, avg);
 
-                if (VERBOSE) {
-                    final String format = "Count: %s, Date: %s, Sum: %5.2f, Avg: %5.2f, Close: %5.2f";
-                    logger.info(String.format(format, count, day.getDate(), sum, avg, day.getClose()));
-                }
-
-                // Now remove the LAST day's value ahead of the next loop
-                sum -= DayDB.getDayList().get(count - value).getClose();
+            if (VERBOSE) {
+                final String format = "Count: %s, Date: %s, Sum: %5.2f, Avg: %5.2f, Close: %5.2f";
+                logger.info(String.format(format, count, day.getDate(), sum, avg, day.getClose()));
             }
+
+            // Now remove the LAST day's value so we're ready for the next loop
+            sum -= DayDB.getDayList().get(count - value).getClose();
         }
 
     }

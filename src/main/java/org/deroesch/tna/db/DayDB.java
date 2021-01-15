@@ -34,6 +34,8 @@ import com.google.common.collect.Lists;
 public class DayDB {
 
     /**
+     * A linear list of days ordered by date.
+     * 
      * @return the dayList
      */
     @NonNull
@@ -42,6 +44,8 @@ public class DayDB {
     }
 
     /**
+     * An dictionary of days indexed by date.
+     * 
      * @return the dayMap
      */
     @NonNull
@@ -50,9 +54,16 @@ public class DayDB {
     }
 
     /**
+     * Empty the dayList to allow reloading.
+     */
+    public static void reset() {
+        dayList.clear();
+    }
+
+    /**
      * Figure out the correct pathname for the input file, then load it.
      *
-     * @param context  We need the context of figure out where to look for files.
+     * @param context  We need the context to figure out where to look for files.
      * @param location The target file path (relative).
      * @throws IOException
      */
@@ -61,18 +72,24 @@ public class DayDB {
         Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(location);
 
-        // Only run once
+        // Only only once
         if (dayList.size() > 0)
             return;
 
+        // Find the path
+        Path path;
         final URI uri = context.getResource(String.format("classpath:%s", location)).getURI();
         if (uri.getScheme().equals("jar")) {
-
             try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap());) {
-                load(fs.getPath("/BOOT-INF/classes/" + location));
+                path = fs.getPath("/BOOT-INF/classes/" + location);
             }
         } else
-            load(Paths.get(uri));
+            path = Paths.get(uri);
+
+        // Load and log
+        loadFromSpreadsheet(path);
+        if (VERBOSE)
+            logger.info(String.format("Loaded %s records.", dayList.size()));
 
     }
 
@@ -82,9 +99,10 @@ public class DayDB {
      * @param path The target file path (relative).
      * @throws IOException
      */
-    public static void load(@NonNull final Path path) throws IOException {
+    public static void loadFromSpreadsheet(@NonNull final Path path) throws IOException {
         Preconditions.checkNotNull(path);
 
+        // Loop through each row in the spreadsheet
         try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(path.toFile()))) {
             final XSSFSheet sheet = workbook.getSheetAt(0);
             final Iterator<Row> ri = sheet.iterator();
