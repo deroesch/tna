@@ -44,6 +44,17 @@ public class DayDB {
     }
 
     /**
+     * Get day n, n >= 0
+     * 
+     * @param n
+     * @return
+     */
+    public static Day getDay(@NonNull Integer n) {
+        Preconditions.checkNotNull(n);
+        return getDayList().get(n);
+    }
+
+    /**
      * An dictionary of days indexed by date.
      * 
      * @return the dayMap
@@ -51,6 +62,17 @@ public class DayDB {
     @NonNull
     public static Map<Date, Day> getDayMap() {
         return dayMap;
+    }
+
+    /**
+     * Get the day at date
+     * 
+     * @param date
+     * @return
+     */
+    public static Day getDay(@NonNull Date date) {
+        Preconditions.checkNotNull(date);
+        return getDayMap().get(date);
     }
 
     /**
