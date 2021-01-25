@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
- *
+ * Test the TnaApplication
  */
 @SpringBootTest
 class TnaApplicationTests {
@@ -49,8 +49,9 @@ class TnaApplicationTests {
     }
 
     /**
-     * @throws IOException
+     * Test some moving averages
      * 
+     * @throws IOException
      */
     @Test
     void testMAs() throws IOException {
