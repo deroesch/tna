@@ -7,9 +7,9 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -60,7 +60,7 @@ public class DayDB {
      * @return the dayMap
      */
     @NonNull
-    public static Map<Date, Day> getDayMap() {
+    public static Map<LocalDateTime, Day> getDayMap() {
         return dayMap;
     }
 
@@ -70,7 +70,7 @@ public class DayDB {
      * @param date
      * @return
      */
-    public static Day getDay(@NonNull Date date) {
+    public static Day getDay(@NonNull LocalDateTime date) {
         Preconditions.checkNotNull(date);
         return getDayMap().get(date);
     }
@@ -143,7 +143,7 @@ public class DayDB {
 
                 // The day's calendar date
                 c = ci.next();
-                final Date date = c.getDateCellValue();
+                final LocalDateTime date = c.getLocalDateTimeCellValue();
 
                 // The day's opening price
                 c = ci.next();
@@ -202,7 +202,7 @@ public class DayDB {
     /*
      * Data stored as a map indexed by date.
      */
-    private static final Map<Date, Day> dayMap = new HashMap<>();
+    private static final Map<LocalDateTime, Day> dayMap = new HashMap<>();
 
     /*************************************************************
      * Miscellaneous

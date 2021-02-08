@@ -1,6 +1,6 @@
 package org.deroesch.tna.models;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,12 +16,6 @@ import com.google.common.base.Preconditions;
 public class Day {
 
     /**
-     * Empty constructor
-     */
-    public Day() {
-    }
-
-    /**
      * Field constructor
      *
      * @param date
@@ -32,7 +26,7 @@ public class Day {
      * @param adjClose
      * @param volume
      */
-    public Day(@NonNull final Date date, @NonNull final Double high, @NonNull final Double low,
+    public Day(@NonNull final LocalDateTime date, @NonNull final Double high, @NonNull final Double low,
             @NonNull final Double open, @NonNull final Double close, @NonNull final Double adjClose,
             @NonNull final Long volume) {
 
@@ -57,7 +51,7 @@ public class Day {
      * @return the date
      */
     @NonNull
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
@@ -106,7 +100,9 @@ public class Day {
      * @param period
      * @return Might return null
      */
-    public Double getMovingAvg(final Integer period) {
+    public Double getMovingAvg(@Positive final Integer period) {
+        Preconditions.checkNotNull(period);
+        Preconditions.checkArgument(period > 0);
         return movingAvgs.get(period);
     }
 
@@ -186,7 +182,7 @@ public class Day {
     /*
      * Fields
      */
-    private Date date;
+    private LocalDateTime date;
     private Double high;
     private Double low;
     private Double open;
